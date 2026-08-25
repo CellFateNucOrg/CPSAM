@@ -20,7 +20,7 @@
 # cpsam_model: Name of the CPSAM model to use or path to a custom model.
 # plot_range: Percentiles defining the data range for the QC plots.
 
-src_dir=(
+src_dirs=(
 
 )
 filter_out=(max)
@@ -41,7 +41,7 @@ pixi_dir=
 pixi_dir=${pixi_dir/Volumes/mnt}
 cd $pixi_dir
 
-for dir in ${src_dir[@]}; do
+for dir in ${src_dirs[@]}; do
     dir=${dir/Volumes/mnt}
     pixi run python segment.py \
     --src_dir $dir \
