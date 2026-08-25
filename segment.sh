@@ -23,7 +23,6 @@
 src_dir=(
 
 )
-
 filter_out=(max)
 seg_channel=0
 redo_seg=true
