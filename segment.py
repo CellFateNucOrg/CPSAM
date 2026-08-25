@@ -99,8 +99,8 @@ def main():
 
                 # Segment data
                 mask, _, _ = load_model.eval(
-                        data_t,
-                        **cpsam_params
+                    data_t,
+                    **cpsam_params
                 )
                 masks.append(mask)
 
