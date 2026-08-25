@@ -5,8 +5,6 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem 32GB
 #SBATCH --gres=gpu:rtx6000:1
-#SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=dario.bernasconi@unibe.ch
 
 #### Config ####
 
@@ -23,13 +21,7 @@
 # plot_range: Percentiles defining the data range for the QC plots.
 
 src_dir=(
-# /Volumes/meister.data/dario/imaging/DPY27/test_max
-# /Volumes/meister.data/dario/imaging/DPY27/test_1268
-# /Volumes/meister.data/dario/imaging/DPY27/test_1268_dw
-/Volumes/meister.data/dario/imaging/DPY27/test_1268_l1_dw
-# /Volumes/meister.data/dario/imaging/DPY27/1268/20260720_e/dw
-# /Volumes/meister.data/dario/imaging/DPY27/1373/20260720_e/dw
-# /Volumes/meister.data/dario/imaging/DPY27/1431/20260720_e/dw
+
 )
 
 filter_out=(max)
@@ -43,7 +35,7 @@ max_size_fraction=0.1
 cpsam_model=cpsam_v2
 mask_type='mask.tif'
 plot_range=(1 99.9)
-pixi_dir=/Volumes/meister.data/dario/code/cpsam
+pixi_dir=
 
 #### Script ####
 
