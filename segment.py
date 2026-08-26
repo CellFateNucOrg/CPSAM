@@ -4,23 +4,24 @@ from bioio import BioImage
 from bioio_ome_tiff.writers import OmeTiffWriter
 import numpy as np
 from cellpose import models
-import polars as pl
+import json
+from datetime import datetime
 from utils import *
 
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--src_dir', required=True, help='Folder with images to segment.')
-    parser.add_argument('--filter_out', required=True, nargs='*', help='Expression(s) to filter out files from the segmentation.')
+    parser.add_argument('--src_dir', required=True, help='Directories with images to segment.')
+    parser.add_argument('--filter_out', required=True, nargs='*', help='Expression(s) to filter out specific files.')
     parser.add_argument('--redo_seg', required=True, help='Whether to redo the segmentation if a mask already exists')
-    parser.add_argument('--seg_channel', required=True, type=int, help='Which channel to segment.')
+    parser.add_argument('--channel', required=True, type=int, help='Which channel to segment.')
     parser.add_argument('--batch_size', required=True, type=int, help='Number of tiles processed in parallel.')
     parser.add_argument('--cellprob_threshold', required=True, type=float, help='Pixels are segmented if their probability of being part of an object is bigger than this.')
     parser.add_argument('--stitch_threshold', required=True, type=float, help='Masks in adjacent planes are stitched in 3D if the overlap is bigger than this.')
     parser.add_argument('--min_size', required=True, type=int, help='Minimum object size in pixel. Smaller segmentations are discarded.')
     parser.add_argument('--max_size_fraction', type=float, required=True, help='Maximum object size as a fraction of image size. Bigger segmentations are discarded.')
     parser.add_argument('--cpsam_model', required=True, help='Name of the CPSAM (or path to a custom) model to use.')
-    parser.add_argument('--mask_type', required=True, help='Suffix and file extension of the mask. File extension should be .tif, .npy or .npz')
+    parser.add_argument('--mask_suffix', required=True, help='Suffix and file extension of the mask. File extension should be .tif, .npy or .npz')
     parser.add_argument('--plot_range', required=True, nargs=2, help='Percentiles defining the data range for the QC plots.')
     return parser.parse_args()
 
@@ -30,18 +31,18 @@ def main():
     src_dir = Path(args.src_dir)
     filter_out = [f for f in args.filter_out]
     redo_seg = args.redo_seg.lower() in ('1', 'true', 'yes')
-    seg_channel = args.seg_channel
+    channel = args.channel
     batch_size = args.batch_size
     cellprob_threshold = args.cellprob_threshold
     stitch_threshold = args.stitch_threshold
     min_size = args.min_size
     max_size_fraction = args.max_size_fraction
     cpsam_model = args.cpsam_model
-    mask_type = args.mask_type
+    mask_suffix = args.mask_suffix
     pths = tuple(float(f) for f in args.plot_range)
     
     # Collect images
-    seg_imgs = collect_images(parse_path(src_dir), filter_out=filter_out)
+    imgs = collect_images(parse_path(src_dir), filter_out=filter_out)
 
     # Load model
     load_model = models.CellposeModel(pretrained_model=cpsam_model, gpu=True)
@@ -56,7 +57,7 @@ def main():
     qcs = []
 
     # Loop over images
-    for img in seg_imgs:
+    for img in imgs:
         # Read image & get dims
         load_img = BioImage(img)
         t, z = load_img.dims['T', 'Z']
@@ -76,7 +77,7 @@ def main():
             cpsam_params['stitch_threshold'] = stitch_threshold
 
         # Make path for mask
-        mask_path = masks_dir / f'{img.stem}_{mask_type}'
+        mask_path = masks_dir / f'{img.stem}_{mask_suffix}'
 
         # Segment image if there's no mask or redo_seg is True
         if not mask_path.exists() or redo_seg:
@@ -94,7 +95,7 @@ def main():
                 data_t = load_img.get_image_data(
                     'TCZYX',
                     T=ti,
-                    C=seg_channel
+                    C=channel
                 ).squeeze()
 
                 # Segment data
@@ -123,12 +124,14 @@ def main():
                 np.savez(mask_path, masks)
 
             # Save log
-            save_metadata(
-                img=img,
-                model=load_model,
-                path=metadata_path,
-                **cpsam_params
-            )
+            params = {
+                'image': img.name,
+                'model': load_model.pretrained_model,
+                'parameters': cpsam_params,
+                'created': datetime.now().isoformat(timespec='seconds')
+            }
+            with open(metadata_path, 'w') as f:
+                json.dump(params, f, indent=4)
 
         # Else load the existing mask
         else:
