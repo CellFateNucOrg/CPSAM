@@ -2,11 +2,9 @@
 #SBATCH --job-name=segmentation
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --time=0-12:00:00
-#SBATCH --cpus-per-task=32
-#SBATCH --mem 32GB
+#SBATCH --cpus-per-task=64
+#SBATCH --mem 64GB
 #SBATCH --gres=gpu:1
-#SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=dario.bernasconi@unibe.ch
 
 #### Config ####
 
@@ -20,18 +18,11 @@
 # min_size: Minimum object size in pixel. Smaller segmentations are discarded.
 # max_size_fraction: Maximum obect size as a fraction of the image size. Bigger objects are discarded.
 # cpsam_model: Name of the CPSAM (or path to a custom) model to use.
-# mask_suffix: Suffix and file extension of the mask. File extension should be .tif, .npy or .npz.
+# mask_str: Suffix and file extension of the mask. File extension should be .tif, .npy or .npz.
 # plot_range: Percentiles defining the data range for the QC plots.
 # pixi_dir: Directory of the pixi workspace
 
 src_dirs=(
- /Volumes/meister.data/dario/imaging/DPY27/test_max
-# /Volumes/meister.data/dario/imaging/DPY27/test_1268
-# /Volumes/meister.data/dario/imaging/DPY27/test_1268_dw
-# /Volumes/meister.data/dario/imaging/DPY27/test_1268_l1_dw
-# /Volumes/meister.data/dario/imaging/DPY27/1268/20260720_e/dw
-# /Volumes/meister.data/dario/imaging/DPY27/1373/20260720_e/dw
-# /Volumes/meister.data/dario/imaging/DPY27/1431/20260720_e/dw
 )
 filter_out=()
 channel=0
@@ -42,7 +33,7 @@ stitch_threshold=0.5
 min_size=15
 max_size_fraction=0.1
 cpsam_model=cpsam_v2
-mask_suffix='mask.tif'
+mask_str='_mask.tif'
 plot_range=(1 99.9)
 pixi_dir=/Volumes/meister.data/dario/code/cpsam
 
@@ -63,6 +54,6 @@ for dir in ${src_dirs[@]}; do
     --min_size $min_size \
     --max_size_fraction $max_size_fraction \
     --cpsam_model $cpsam_model \
-    --mask_suffix $mask_suffix \
+    --mask_str $mask_str \
     --plot_range ${plot_range[@]}
 done
