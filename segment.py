@@ -1,12 +1,12 @@
 import argparse
 from pathlib import Path
 from bioio import BioImage
-from bioio_ome_tiff.writers import OmeTiffWriter
 import numpy as np
 from cellpose import models
 import json
 from datetime import datetime
-from utils import *
+from utils import parse_path, collect_images, save_masks
+from qc import plot_masks
 
 
 def get_args():
@@ -45,7 +45,7 @@ def main():
     imgs = collect_images(parse_path(src_dir), filter_out=filter_out)
 
     # Load model
-    load_model = models.CellposeModel(pretrained_model=cpsam_model, gpu=True)
+    model = models.CellposeModel(pretrained_model=cpsam_model, gpu=True)
 
     # Make dirs
     masks_dir = src_dir / 'masks'
@@ -54,10 +54,10 @@ def main():
     logs_dir.mkdir(parents=True, exist_ok=True)
 
     # Loop over images
-    for img in imgs:
+    for img_path in imgs:
         # Read image & get dims
-        load_img = BioImage(img)
-        t, z = load_img.dims['T', 'Z']
+        img = BioImage(img_path)
+        t, z = img.dims['T', 'Z']
 
         # Set CPSAM parameters
         cpsam_params = {
@@ -74,7 +74,7 @@ def main():
             cpsam_params['stitch_threshold'] = stitch_threshold
 
         # Make path for mask
-        mask_path = masks_dir / f'{img.stem}{mask_str}'
+        mask_path = masks_dir / f'{img_path.stem}{mask_str}'
 
         # Segment image if there's no mask or redo_seg is True
         if not mask_path.exists() or redo_seg:
@@ -83,17 +83,17 @@ def main():
 
             for ti in range(t):
                 # Make path for plot
-                plots_path = masks_dir / f'{img.stem}_t{ti:03}_plots.pdf'
+                plots_path = masks_dir / f'{img_path.stem}_t{ti:03}_plots.pdf'
 
                 # Get data from time point
-                data_t = load_img.get_image_data(
+                data_t = img.get_image_data(
                     'TCZYX',
                     T=ti,
                     C=channel
                 ).squeeze()
 
                 # Segment data
-                mask, _, _ = load_model.eval(
+                mask, _, _ = model.eval(
                     data_t,
                     **cpsam_params
                 )
@@ -110,32 +110,20 @@ def main():
 
             # Stack & save masks
             masks = np.stack(masks)
-            if mask_path.suffix == '.tif':
-                OmeTiffWriter.save(masks, mask_path)
-            elif mask_path.suffix == '.npy':
-                np.save(mask_path, masks)
-            elif mask_path.suffix == '.npz':
-                np.savez(mask_path, masks)
+            save_masks(masks, mask_path)
 
-            # Save log
-            metadata_path = logs_dir / f'{img.stem}.json'
+            # Save metadata
+            metadata_path = logs_dir / f'{img_path.stem}.json'
             params = {
-                'image': img.name,
-                'model': load_model.pretrained_model,
+                'image': img_path.name,
+                'model': model.pretrained_model,
                 'parameters': cpsam_params,
                 'created': datetime.now().isoformat(timespec='seconds')
             }
             with open(metadata_path, 'w') as f:
                 json.dump(params, f, indent=4)
 
-        # Else load the existing mask
-        else:
-            load_mask = BioImage(mask_path)
-            masks = load_mask.get_image_data('TCZYX')
 
-        if z > 1:
-            cpsam_params.pop('z_axis')
-            cpsam_params.pop('stitch_threshold')
 
 if __name__=='__main__':
     main()
