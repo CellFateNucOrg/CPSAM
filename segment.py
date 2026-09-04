@@ -21,7 +21,7 @@ def get_args():
     parser.add_argument('--min_size', required=True, type=int, help='Minimum object size in pixel. Smaller segmentations are discarded.')
     parser.add_argument('--max_size_fraction', type=float, required=True, help='Maximum object size as a fraction of image size. Bigger segmentations are discarded.')
     parser.add_argument('--cpsam_model', required=True, help='Name of the CPSAM (or path to a custom) model to use.')
-    parser.add_argument('--mask_suffix', required=True, help='Suffix and file extension of the mask. File extension should be .tif, .npy or .npz')
+    parser.add_argument('--mask_str', required=True, help='Suffix and file extension of the mask. File extension should be .tif, .npy or .npz')
     parser.add_argument('--plot_range', required=True, nargs=2, help='Percentiles defining the data range for the QC plots.')
     return parser.parse_args()
 
@@ -38,7 +38,7 @@ def main():
     min_size = args.min_size
     max_size_fraction = args.max_size_fraction
     cpsam_model = args.cpsam_model
-    mask_suffix = args.mask_suffix
+    mask_str = args.mask_str
     pths = tuple(float(f) for f in args.plot_range)
     
     # Collect images
@@ -52,9 +52,6 @@ def main():
     masks_dir.mkdir(parents=True, exist_ok=True)
     logs_dir = masks_dir / 'logs'
     logs_dir.mkdir(parents=True, exist_ok=True)
-
-    # Make list and path for QC
-    qcs = []
 
     # Loop over images
     for img in imgs:
@@ -77,19 +74,16 @@ def main():
             cpsam_params['stitch_threshold'] = stitch_threshold
 
         # Make path for mask
-        mask_path = masks_dir / f'{img.stem}_{mask_suffix}'
+        mask_path = masks_dir / f'{img.stem}{mask_str}'
 
         # Segment image if there's no mask or redo_seg is True
         if not mask_path.exists() or redo_seg:
             # Make list for the masks
             masks = []
 
-            # Make path for log file
-            metadata_path = logs_dir / f'{img.stem}.json'
-
             for ti in range(t):
                 # Make path for plot
-                plot_path = masks_dir / f'{img.stem}_t{ti:03}_plots.pdf'
+                plots_path = masks_dir / f'{img.stem}_t{ti:03}_plots.pdf'
 
                 # Get data from time point
                 data_t = load_img.get_image_data(
@@ -110,7 +104,7 @@ def main():
                     img=data_t,
                     mask=mask,
                     pths=pths,
-                    path=plot_path,
+                    path=plots_path,
                     show=False
                 )
 
@@ -124,6 +118,7 @@ def main():
                 np.savez(mask_path, masks)
 
             # Save log
+            metadata_path = logs_dir / f'{img.stem}.json'
             params = {
                 'image': img.name,
                 'model': load_model.pretrained_model,
