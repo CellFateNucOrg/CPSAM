@@ -68,7 +68,7 @@ def main():
             'z_axis': None
         }
 
-        # Add stitch threshold & set Z axis if the data is 3D
+        # Set Z axis & add stitching threshold if the image is 3D
         if z > 1:
             cpsam_params['z_axis'] = 0
             cpsam_params['stitch_threshold'] = stitch_threshold
@@ -93,10 +93,7 @@ def main():
                 ).squeeze()
 
                 # Segment data
-                mask, _, _ = model.eval(
-                    data_t,
-                    **cpsam_params
-                )
+                mask, _, _ = model.eval(data_t, **cpsam_params)
                 masks.append(mask)
 
                 # Make QC plots
