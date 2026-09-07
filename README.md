@@ -31,6 +31,6 @@ Before you run the pipeline, set the parameters below in `segment.sh`. A importa
 * `max_size`: Maximum mask size as a fraction of total image size. Default is 0.4.
 * `cpsam_model`: Name of the CPSAM model to use or a path to a custom-trained model. Default is `cpsam_v2`.
 * `mask_str`: Suffix that differentiates the mask from its corresponding image (e.g., _mask.tif).
-* `plot_range=()`: Percentiles defining what data range is used for the QC plots. Especially with deconvolved, using the full data range leads to oversaturated plots. What works better there (and should also give an acceptable result when segmenting raw images is: `(1, 0.99)`.
+* `plot_range=()`: Percentiles defining what data range is used for the QC plots. Especially with deconvolved images, using the full data range leads to oversaturated plots. What works better (and should still be acceptable for raw images) is `(1, 0.99)`.
 * `pixi_dir`: Path to this repository (including the folder `CPSAM` itself).
 
