@@ -119,8 +119,7 @@ def main():
             }
             with open(metadata_path, 'w') as f:
                 json.dump(params, f, indent=4)
-
-
+                
 
 if __name__=='__main__':
     main()
