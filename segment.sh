@@ -18,9 +18,9 @@
 # min_size: Minimum object size in pixel. Smaller segmentations are discarded.
 # max_size_fraction: Maximum obect size as a fraction of the image size. Bigger objects are discarded.
 # cpsam_model: Name of the CPSAM (or path to a custom) model to use.
-# mask_str: Suffix that differentiates the mask from its corresponding image (e.g., `_mask.tif`). File extension should be .tif, .npy, or .npz.
+# mask_str: Suffix that differentiates the mask from its corresponding image (e.g., '_mask.tif'). File extension should be '.tif', '.npy', or '.npz'.
 # plot_range: Percentiles defining the data range for the QC plots.
-# pixi_dir: Directory of the pixi workspace
+# pixi_dir: Directory of the pixi workspace.
 
 src_dirs=(
 )
