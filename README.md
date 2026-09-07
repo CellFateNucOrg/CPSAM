@@ -2,10 +2,10 @@
 Segmentation of C. elegans microscopy images with Cellpose-SAM.
 # Installation
 Installation instructions are given for pixi, but you can also use conda/mamba.
-1. If you don't have pixi yet, install it from:`https://pixi.prefix.dev/latest/installation/`
+1. If you don't have pixi yet, install it from:`https://pixi.prefix.dev/latest/installation/`.
 2. Navigate to where you want to place the repository.
-3. Clone the repository: `git clone https://github.com/CellFateNucOrg/CPSAM/`
-4. Install the required packages: `pixi install`
+3. Clone the repository: `git clone https://github.com/CellFateNucOrg/CPSAM/`.
+4. Install the required packages: `pixi install`.
 5. Confirm that CUDA is available (so you can run the pipeline with GPU support):
 ```
 srun --gres gpu:1 --pty bash
