@@ -65,7 +65,6 @@ def main():
             'cellprob_threshold': cellprob_threshold,
             'min_size': min_size,
             'max_size_fraction': max_size_fraction,
-            'z_axis': None
         }
 
         # Set Z axis & add stitching threshold if the image is 3D
