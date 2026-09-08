@@ -92,7 +92,7 @@ def main():
                     C=channel
                 ).squeeze()
 
-                # Segment data
+                # Segment data & add it to the list
                 mask, _, _ = model.eval(data_t, **cpsam_params)
                 masks.append(mask)
 
