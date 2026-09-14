@@ -77,6 +77,7 @@ def main():
 
         # Segment image if there's no mask or redo_seg is True
         if not mask_path.exists() or redo_seg:
+            print(f'Segmenting image {img_path.name}')
             # Make list for the masks
             masks = []
 
@@ -118,7 +119,7 @@ def main():
             }
             with open(metadata_path, 'w') as f:
                 json.dump(params, f, indent=4)
-                
+
 
 if __name__=='__main__':
     main()
