@@ -44,4 +44,4 @@ Before running the pipeline, open `segment.sh` and specify the parameters as fol
 Once all the parameters are set, launch the script: `sbatch segment.sh`.
 
 # Output
-Segmented masks are stored as a `.tif`, `.npy`, or a `.npz` file. For each mask, a QC plot is saved as a .pdf file (if the input is 3D, the plots consist of three x-y, x-z, and y-z planes each). 
+Segmented masks are stored as a `.tif`, `.npy`, or a `.npz` file. For each mask, a QC plot is saved as a PDF file. For Z-stacks, three different planes are plotted in x-y, x-z, and y-z each. For time series, each frame gets a separate QC plot.
