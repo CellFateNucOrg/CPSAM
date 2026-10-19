@@ -11,8 +11,8 @@
 src_dirs=(
 
 )
-filter_out=(max bf)
-skip_old=false
+filter_out=()
+skip_old=true
 channel=0
 track_cells=false
 batch_size=64
