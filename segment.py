@@ -125,23 +125,23 @@ def main():
                     T=ti,
                     C=channel
                 ).squeeze()
-                mask_data, _, _ = model.eval(data, **cpsam_params)
+                mask, _, _ = model.eval(data, **cpsam_params)
 
                 # If the mask contains a single frame, plot it and expand its dims for saving
                 if t == 1:
                     qc_path = qc_dir / f'{img_path.stem}.pdf'
                     plot_masks(
                         img=data,
-                        mask=mask_data,
+                        mask=mask,
                         pths=pths,
                         path=qc_path,
                         show=False
                     )
-                    mask = np.expand_dims(mask_data, axis=(0, 1)) # Add T & C axes
+                    mask = np.expand_dims(mask, axis=(0, 1)) # Add T & C axes
 
                 # Else add it to the list for stacking
                 else:
-                    t_masks.append(mask_data)
+                    t_masks.append(mask)
 
             # If the mask contains multiple frames...
             if t > 1:
@@ -162,10 +162,10 @@ def main():
                         T=ti,
                         C=channel
                     ).squeeze()
-                    mask_data_t = mask[ti, ...]
+                    mask_t = mask[ti, ...]
                     plot_masks(
                         img=data_t,
-                        mask=mask_data_t,
+                        mask=mask_t,
                         pths=pths,
                         path=qc_path,
                         show=False
