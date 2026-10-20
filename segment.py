@@ -83,6 +83,8 @@ def main():
     masks_dir.mkdir(parents=True, exist_ok=True)
     logs_dir = masks_dir / 'logs'
     logs_dir.mkdir(parents=True, exist_ok=True)
+    qc_dir = masks_dir / 'qc'
+    qc_dir.mkdir(parents=True, exist_ok=True)
 
     # Loop over images
     for img_path in imgs:
@@ -127,7 +129,7 @@ def main():
 
                 # If the mask contains a single frame, plot it and expand its dims for saving
                 if t == 1:
-                    qc_path = masks_dir / f'{img_path.stem}_qc.pdf'
+                    qc_path = qc_dir / f'{img_path.stem}.pdf'
                     plot_masks(
                         img=data,
                         mask=mask_data,
@@ -135,7 +137,7 @@ def main():
                         path=qc_path,
                         show=False
                     )
-                    mask = np.expand_dims(mask, axis=(0, 1)) # Add T & C axes
+                    mask = np.expand_dims(mask_data, axis=(0, 1)) # Add T & C axes
 
                 # Else add it to the list for stacking
                 else:
@@ -154,7 +156,7 @@ def main():
 
                 # ...make one QC plot each
                 for ti in range(t):
-                    qc_path = masks_dir / f'{img_path.stem}_t{ti:03}_qc.pdf'
+                    qc_path = qc_dir / f'{img_path.stem}_t{ti:03}.pdf'
                     data_t = img.get_image_data(
                         'TCZYX',
                         T=ti,
