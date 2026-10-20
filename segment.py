@@ -86,7 +86,6 @@ def main():
     qc_dir = masks_dir / 'qc'
     qc_dir.mkdir(parents=True, exist_ok=True)
 
-    # Loop over images
     for img_path in imgs:
         # Make path for the mask
         mask_path = masks_dir / f'{img_path.stem}{mask_str}'
@@ -117,7 +116,6 @@ def main():
             # Make list for the masks
             t_masks = []
 
-            # Segment each frame
             for ti in range(t):
                 # Segment data from current time point
                 data = img.get_image_data(
