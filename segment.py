@@ -52,6 +52,7 @@ def get_args():
     parser.add_argument('--cpsam_model', required=True, help='Name of the CPSAM (or path to a custom) model to use.')
     parser.add_argument('--mask_str', required=True, help='Suffix and file extension of the mask. File extension should be .tif, .npy or .npz')
     parser.add_argument('--plot_range', required=True, nargs=2, help='Percentiles defining the data range for the QC plots.')
+    parser.add_argument('--folder', required=True, help='Optional subfolder (inside the masks folder) into which the masks will be saved.')
     return parser.parse_args()
 
 
@@ -70,6 +71,7 @@ def main():
     cpsam_model = args.cpsam_model
     mask_str = args.mask_str
     pths = tuple(float(f) for f in args.plot_range)
+    folder = args.folder
 
     
     # Collect images
@@ -79,7 +81,7 @@ def main():
     model = models.CellposeModel(pretrained_model=cpsam_model, gpu=True)
 
     # Make dirs
-    masks_dir = src_dir / 'masks'
+    masks_dir = src_dir / 'masks' / folder
     masks_dir.mkdir(parents=True, exist_ok=True)
     logs_dir = masks_dir / 'logs'
     logs_dir.mkdir(parents=True, exist_ok=True)
