@@ -16,7 +16,7 @@ This should print something like:
 ```
 2.14.0+cu130
 13.0
-True # This confirms that is CUDA available
+True # This confirms that CUDA is available
 ```
 
 # Input
