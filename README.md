@@ -31,7 +31,7 @@ Before running the pipeline, open `segment.sh` and specify the parameters as fol
 * `filter_out=()`: Expression(s) (separated by space or line) to filter out specific files. If your input directory contains files you don't want to segment, use this option to filter them out.
 * `skip_old`: Whether to skip images if a corresponding mask file already exists. `true` or `false`.
 * `channel`: Which channel you want to segment.
-* `batch_size`: Number of tiles processes in parallel. Default is 64. Decrease if you get out-of-memory errors.
+* `batch_size`: Number of tiles processed in parallel. Default is 64. Decrease if you get out-of-memory errors.
 * `cellprob_threshold`: Threshold for deciding whether a pixel belongs to a mask. -6 to +6; default is 0. Decrease if your images are under-segmented and vice versa.
 * `stitch_threshold`: Threshold for 3D stitching. Masks in adjacent planes which overlap by more than this value are stitched together, i.e., become part of the same 3D mask. 0 to 1; default is 0. Decrease if your images are under-segmented (in 3D) and vice versa.
 * `min_size`: Minimum mask size in pixels. Smaller segmentations are discarded. Default is 15.
